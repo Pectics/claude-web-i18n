@@ -1,0 +1,47 @@
+{
+  "manifest_version": 3,
+  "name": "Claude i18n",
+  "description": "Use Claude in your own language.",
+  "version": "1.0.0",
+  "permissions": [
+    "storage",
+    "unlimitedStorage"
+  ],
+  "host_permissions": [
+    "https://claude.ai/*",
+    "https://claude-web-i18n.vercel.app/*"
+  ],
+  "background": {
+    "service_worker": "service.js"
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "script.js"
+      ],
+      "run_at": "document_start",
+      "matches": [
+        "https://claude.ai/*"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "hook.js"
+      ],
+      "matches": [
+        "https://claude.ai/*"
+      ]
+    }
+  ],
+  "action": {
+    "default_icon": "assets/logo.png"
+  },
+  "icons": {
+    "16": "assets/logo.16x.png",
+    "32": "assets/logo.32x.png",
+    "48": "assets/logo.48x.png",
+    "128": "assets/logo.128x.png"
+  }
+}
