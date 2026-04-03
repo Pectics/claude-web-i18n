@@ -1,3 +1,6 @@
 dist/
 .remember
 .translation
+CLAUDE.md
+
+*.bak/
