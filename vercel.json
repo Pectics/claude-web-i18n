@@ -3,6 +3,10 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/version/:locale.json",
+      "destination": "/:locale/version.json"
+    },
+    {
       "source": "/i18n/:locale.json",
       "destination": "/:locale/:locale.json"
     },
