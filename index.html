@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Claude Web i18n</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f7fb;
+        --card: #ffffff;
+        --text: #14213d;
+        --muted: #4f5d75;
+        --accent: #ef6c00;
+        --border: #d9deea;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+        background:
+          radial-gradient(circle at top left, #ffe0b2 0, transparent 32%),
+          linear-gradient(180deg, #fffaf3 0%, var(--bg) 100%);
+        color: var(--text);
+      }
+
+      main {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 48px 20px 72px;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 18px 40px rgba(20, 33, 61, 0.08);
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 4vw, 3.4rem);
+      }
+
+      p,
+      li,
+      code,
+      a {
+        font-size: 16px;
+        line-height: 1.7;
+      }
+
+      p,
+      li {
+        color: var(--muted);
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      code {
+        background: #fff3e0;
+        border-radius: 8px;
+        padding: 2px 8px;
+        color: #8d4a00;
+      }
+
+      ul {
+        padding-left: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="card">
+        <h1>Claude Web i18n</h1>
+        <p>这个仓库已经调整为可直接部署到 Vercel 的静态站点。</p>
+        <p>线上只会发布白名单中的语言目录，例如 <code>/zh-CN/_i18n_zh-CN.json</code>。</p>
+        <p>同时配置了重写规则，下面这个地址会自动映射到对应文件：</p>
+        <ul>
+          <li><code>/i18n/zh-CN.json</code> -> <code>/zh-CN/_i18n_zh-CN.json</code></li>
+        </ul>
+        <p><code>extension/</code> 不会被打进 Vercel 的发布产物，因此前端无法直接访问。</p>
+        <p>
+          直接访问示例：
+          <a href="/i18n/zh-CN.json">/i18n/zh-CN.json</a>
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

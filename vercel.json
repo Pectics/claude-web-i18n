@@ -1,0 +1,10 @@
+{
+  "buildCommand": "bash ./build.sh",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/i18n/:locale.json",
+      "destination": "/:locale/_i18n_:locale.json"
+    }
+  ]
+}
