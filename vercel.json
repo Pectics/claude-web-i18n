@@ -5,6 +5,10 @@
     {
       "source": "/i18n/:locale.json",
       "destination": "/:locale/_i18n_:locale.json"
+    },
+    {
+      "source": "/i18n/statsig/:locale.json",
+      "destination": "/:locale/_i18n_statsig_:locale.json"
     }
   ]
 }
