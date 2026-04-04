@@ -4,3 +4,6 @@ dist/
 CLAUDE.md
 
 *.bak/
+
+*.pem
+*.crx
