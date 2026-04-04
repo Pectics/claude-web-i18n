@@ -6,7 +6,7 @@
 
 **给 Claude.ai 加上一个并不存在的语言。**
 
-简体中文 | [繁體中文](README.zh-TW.md) | [English](README.en.md)
+简体中文 | [繁體中文](README.tw.md) | [English](README.en.md)
 
 [![Version](https://img.shields.io/badge/版本-v1.0.0-orange?style=flat-square)](https://github.com/pectics/claude-web-i18n/releases)
 [![License](https://img.shields.io/badge/许可证-MIT-blue?style=flat-square)](LICENSE)
