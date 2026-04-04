@@ -1,0 +1,155 @@
+<div align="center">
+
+<img src="extension/assets/logo.512x.png" width="120" alt="Claude i18n Logo" />
+
+# Claude i18n
+
+**给 Claude.ai 加上一个并不存在的语言。**
+
+简体中文 | [繁體中文](README.zh-TW.md) | [English](README.en.md)
+
+[![Version](https://img.shields.io/badge/版本-v1.0.0-orange?style=flat-square)](https://github.com/pectics/claude-web-i18n/releases)
+[![License](https://img.shields.io/badge/许可证-MIT-blue?style=flat-square)](LICENSE)
+[![Platform](https://img.shields.io/badge/平台-Chrome%20%7C%20Edge-brightgreen?style=flat-square)](#安装)
+[![Locale](https://img.shields.io/badge/已支持-简体中文-red?style=flat-square)](#支持的语言)
+
+</div>
+
+---
+
+## 它能做什么？
+
+Claude 官方至今不支持简体中文界面。**这个扩展解决了这个问题。**
+
+安装后，Claude Web 的语言菜单里会出现 **简体中文** 选项。点一下，近万条 UI 文本瞬间切换为中文。不需要代理，不需要配置，不需要等 Anthropic 哪天心情好了才支持。
+
+<div align="center">
+
+| 之前 | 之后 |
+|:---:|:---:|
+| 界面全英文，找个设置找半天 | 简体中文，一眼就知道在哪 |
+| 不敢用生怕误触什么 | 用起来像母语一样自然 |
+| 每次刷新都得重新适应 | 记住你的选择，永久生效 |
+
+</div>
+
+---
+
+## 安装
+
+### 方式一：从 Releases 下载（推荐）
+
+> ⚡ 30 秒搞定，无需任何技术知识
+
+1. 前往 [Releases 页面](https://github.com/pectics/claude-web-i18n/releases)，下载最新版本的 `.crx` 文件
+2. 打开 Chrome / Edge，进入 `chrome://extensions/`
+3. 打开右上角的 **开发者模式**
+4. 将下载的 `.crx` 文件**直接拖进**浏览器窗口
+5. 点击「添加扩展程序」确认安装
+6. 打开 [claude.ai](https://claude.ai)，点击左下角用户名 → 语言 → **简体中文** ✓
+
+### 方式二：从源码构建
+
+```bash
+git clone https://github.com/pectics/claude-web-i18n.git
+cd claude-web-i18n
+```
+
+然后在 `chrome://extensions/` 中打开**开发者模式**，选择「加载已解压的扩展程序」，选择项目的 `extension/` 目录。
+
+### 方式三：应用商店安装（审核中）
+
+Chrome Web Store 和 Edge 外接程序商店的版本正在审核，上架后会在此更新链接，敬请期待。
+
+---
+
+## 它是怎么工作的？
+
+Claude 的后端接口拒绝 `zh-CN` 这个 locale 值（会直接返回验证错误）。所以这个扩展没有去碰后端——它在浏览器端拦截了所有语言包请求，把它们替换成托管在 Vercel 上的中文资源。
+
+```
+你点击「简体中文」
+        ↓
+扩展注入自定义菜单项（与原生菜单外观一致）
+        ↓
+Claude 发出 /i18n/*.json 请求
+        ↓
+扩展在页面层拦截请求（无感知）
+        ↓
+返回 9951 条精心翻译的中文文本
+        ↓
+UI 全面切换为中文，无需刷新
+```
+
+**智能缓存：** 语言包在本地双重缓存（Cache Storage + chrome.storage.local），配合版本哈希校验。第一次加载后，后续切换几乎瞬间完成，且在版本没有更新时完全不发出网络请求。
+
+---
+
+## 支持的语言
+
+| 语言 | 翻译条目 | 状态 |
+|------|----------|------|
+| 简体中文 (zh-CN) | 9,951 条 | ✅ 可用 |
+| 更多语言 | — | 欢迎贡献 |
+
+---
+
+## 参与贡献
+
+### 改进翻译
+
+翻译文件位于 [`zh-CN/zh-CN.json`](zh-CN/zh-CN.json)。原文对照在 [`.original/en-US.json`](.original/en-US.json)。
+
+直接编辑 JSON 文件提 PR 即可，结构非常简单：
+
+```json
+{
+  "some.ui.key": "对应的中文翻译"
+}
+```
+
+### 添加新语言
+
+1. 在 `supported-locales.txt` 中添加新 locale（如 `ja-JP`）
+2. 创建对应目录和翻译文件（参考 `zh-CN/` 的结构）
+3. 提交 PR
+
+### 本地构建
+
+```bash
+# 构建语言包分发文件
+./build.sh
+
+# 打包 Edge 版本 zip
+./build-edge-zip.sh
+```
+
+---
+
+## 常见问题
+
+**切换语言后没有效果？**
+确认扩展已启用，然后刷新 claude.ai 页面。
+
+**会影响我的 Claude 账号吗？**
+不会。扩展只在浏览器端工作，不修改任何账号设置或与 Anthropic 服务器交互（除了正常的语言包拉取）。
+
+**切换回英文还能正常用吗？**
+完全没问题。在语言菜单选择任意官方支持的语言，扩展会自动退出中文模式。
+
+**语言包会自动更新吗？**
+会。扩展通过版本哈希检测远端更新，有新版本时自动下拉最新语言包。
+
+---
+
+## 许可证
+
+[MIT](LICENSE) © 2026 [Pectics](https://github.com/Pectics)
+
+---
+
+<div align="center">
+
+如果这个扩展对你有用，给个 Star ⭐ 就是最好的支持。
+
+</div>
