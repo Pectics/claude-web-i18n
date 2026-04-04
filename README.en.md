@@ -4,7 +4,7 @@
 
 # Claude i18n
 
-**Adding a language to Claude.ai that doesn't officially exist.**
+**Gives Claude.ai a language that doesn't officially exist.**
 
 [简体中文](README.md) | [繁體中文](README.tw.md) | English
 
