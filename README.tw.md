@@ -110,7 +110,7 @@ UI 全面切換為中文，無需重整
 
 ### 新增語言
 
-1. 在 `supported-locales.txt` 中新增 locale（如 `ja-JP`）
+1. 在 [`locales.json`](locales.json) 中新增 locale 條目（如 `{"locale": "zh-TW", "name": "繁體中文 (台灣)"}`)
 2. 建立對應目錄和翻譯檔案（參考 `zh-CN/` 的結構）
 3. 送出 PR
 

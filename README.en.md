@@ -110,7 +110,7 @@ Edit the JSON file and open a PR. The structure is straightforward:
 
 ### Adding a new language
 
-1. Add the new locale to `supported-locales.txt` (e.g. `ja-JP`)
+1. Add a new locale entry to [`locales.json`](locales.json) (e.g. `{"locale": "zh-TW", "name": "繁體中文 (台灣)"}`)
 2. Create the locale directory and translation files (see `zh-CN/` for reference)
 3. Open a PR
 
