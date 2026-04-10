@@ -1,6 +1,4 @@
-const CUSTOM_LANGUAGE_ID = "zh-CN-custom";
-const CUSTOM_LOCALE = "zh-CN";
-const EXTENSION_LOCALES = new Set([CUSTOM_LOCALE]);
+const EXTENSION_LOCALES_STORAGE_KEY = "claude-i18n:extension-locales";
 const OVERRIDE_STORAGE_KEY = "claude-i18n:locale";
 const PAGE_HOOK_SCRIPT_ID = "claude-i18n-page-hook";
 const MENU_STYLE_ID = "claude-i18n-menu-style";
@@ -10,10 +8,14 @@ const PAGE_HOOK_TIMEOUT_MS = 1500;
 
 let pageRequestCounter = 0;
 
+// Locale manifest loaded from service worker; fallback to empty until fetched.
+let extensionLocaleMap = new Map(); // locale -> { locale, name }
+
 injectPageHook();
 injectMenuStyle();
 registerPageHookBridge();
 startMenuObserver();
+loadLocaleManifest();
 
 function injectPageHook() {
   if (document.getElementById(PAGE_HOOK_SCRIPT_ID)) {
@@ -171,7 +173,36 @@ function clearOverrideLocale() {
 }
 
 function isExtensionLocale(locale) {
-  return typeof locale === "string" && EXTENSION_LOCALES.has(locale);
+  return typeof locale === "string" && extensionLocaleMap.has(locale);
+}
+
+async function loadLocaleManifest() {
+  try {
+    const manifest = await chrome.runtime.sendMessage({ type: "get-locale-manifest" });
+    if (!manifest || !Array.isArray(manifest.locales)) {
+      return;
+    }
+
+    extensionLocaleMap = new Map(manifest.locales.map((l) => [l.locale, l]));
+
+    const localeIds = manifest.locales.map((l) => l.locale);
+    writeExtensionLocales(localeIds);
+
+    console.log("[claude-i18n] locale manifest loaded", {
+      version: manifest.version,
+      locales: localeIds,
+    });
+  } catch (error) {
+    console.warn("[claude-i18n] failed to load locale manifest", error);
+  }
+}
+
+function writeExtensionLocales(localeIds) {
+  try {
+    window.localStorage.setItem(EXTENSION_LOCALES_STORAGE_KEY, JSON.stringify(localeIds));
+  } catch {
+    // ignore
+  }
 }
 
 function getRuntimeStatus() {
@@ -381,14 +412,14 @@ function attachHoverBehavior(item) {
   });
 }
 
-function normalizeCustomItem(item) {
+function normalizeCustomItem(item, localeInfo) {
   if (!isElement(item)) {
     return;
   }
 
-  item.setAttribute("lang", CUSTOM_LOCALE);
+  item.setAttribute("lang", localeInfo.locale);
   item.setAttribute("tabindex", "-1");
-  item.setAttribute("aria-label", "Simplified Chinese");
+  item.setAttribute("aria-label", localeInfo.name);
   item.removeAttribute("data-highlighted");
   item.removeAttribute("aria-checked");
   updateSelectionIndicator(item, false);
@@ -396,7 +427,7 @@ function normalizeCustomItem(item) {
 
 function getOfficialLanguageItems(menu) {
   return getMenuItems(menu).filter(
-    (item) => item.getAttribute("data-custom-language-id") !== CUSTOM_LANGUAGE_ID,
+    (item) => item.getAttribute("data-custom-language") !== "true",
   );
 }
 
@@ -408,10 +439,8 @@ function syncMenuSelection(menu) {
   const desiredLocale = getDesiredLocale();
   menu.dataset.claudeI18nMode = isExtensionLocale(desiredLocale) ? "extension" : "official";
 
-  const customItem = menu.querySelector(
-    `[data-custom-language-id="${CUSTOM_LANGUAGE_ID}"]`,
-  );
-  if (isElement(customItem)) {
+  const customItems = menu.querySelectorAll("[data-custom-language='true']");
+  for (const customItem of customItems) {
     updateSelectionIndicator(customItem, getItemLocale(customItem) === desiredLocale);
   }
 }
@@ -486,7 +515,7 @@ function attachOfficialLanguageHandlers(menu) {
   }
 }
 
-function buildCustomLanguageItem(menu) {
+function buildCustomLanguageItem(menu, localeInfo) {
   const items = getMenuItems(menu);
   const templateItem = getUnselectedTemplateItem(items);
   if (!isElement(templateItem)) {
@@ -498,32 +527,34 @@ function buildCustomLanguageItem(menu) {
     return null;
   }
 
-  customItem.setAttribute("data-custom-language-id", CUSTOM_LANGUAGE_ID);
+  const customLanguageId = `${localeInfo.locale}-custom`;
+  customItem.setAttribute("data-custom-language-id", customLanguageId);
   customItem.setAttribute("data-custom-language", "true");
 
-  normalizeCustomItem(customItem);
+  normalizeCustomItem(customItem, localeInfo);
   attachHoverBehavior(customItem);
-  updateItemLabel(customItem, "简体中文 (中国大陆)");
+  updateItemLabel(customItem, localeInfo.name);
 
   customItem.addEventListener(
     "click",
     (event) => {
       stopEvent(event);
 
-      if (getDesiredLocale() === CUSTOM_LOCALE) {
+      if (getDesiredLocale() === localeInfo.locale) {
         return;
       }
 
-      writeOverrideLocale(CUSTOM_LOCALE);
+      writeOverrideLocale(localeInfo.locale);
+      writeExtensionLocales([...extensionLocaleMap.keys()]);
       syncMenuSelection(menu);
 
-      applyLocaleOverride(CUSTOM_LOCALE)
+      applyLocaleOverride(localeInfo.locale)
         .then(() => {
           closeLanguageMenu(menu);
         })
         .catch((error) => {
           console.warn("[claude-i18n] failed to apply runtime locale override", error);
-          fallbackToReload(CUSTOM_LOCALE);
+          fallbackToReload(localeInfo.locale);
         });
     },
     { capture: true },
@@ -539,18 +570,19 @@ function injectCustomLanguage(menu) {
 
   attachOfficialLanguageHandlers(menu);
 
-  let customItem = menu.querySelector(
-    `[data-custom-language-id="${CUSTOM_LANGUAGE_ID}"]`,
-  );
+  for (const localeInfo of extensionLocaleMap.values()) {
+    const customLanguageId = `${localeInfo.locale}-custom`;
+    let customItem = menu.querySelector(`[data-custom-language-id="${customLanguageId}"]`);
 
-  if (!isElement(customItem)) {
-    customItem = buildCustomLanguageItem(menu);
     if (!isElement(customItem)) {
-      return;
-    }
+      customItem = buildCustomLanguageItem(menu, localeInfo);
+      if (!isElement(customItem)) {
+        continue;
+      }
 
-    menu.append(customItem);
-    console.log("[claude-i18n] injected custom language item");
+      menu.append(customItem);
+      console.log("[claude-i18n] injected custom language item", localeInfo.locale);
+    }
   }
 
   syncMenuSelection(menu);

@@ -4,7 +4,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DIST_DIR="$ROOT_DIR/dist"
-LOCALE_LIST_FILE="$ROOT_DIR/supported-locales.txt"
+LOCALES_FILE="$ROOT_DIR/locales.json"
 
 hash_file() {
   local file_path="$1"
@@ -30,8 +30,22 @@ cp "$ROOT_DIR/index.html" "$DIST_DIR/index.html"
 cp "$ROOT_DIR/404.html" "$DIST_DIR/404.html"
 
 BUILT_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+COMMIT_HASH="$(git -C "$ROOT_DIR" rev-parse --short HEAD 2>/dev/null || echo "unknown")"
 
-while IFS= read -r locale || [ -n "$locale" ]; do
+python3 - "$LOCALES_FILE" "$DIST_DIR/locales.json" "$COMMIT_HASH" <<'PYEOF'
+import json, sys
+src, dst, version = sys.argv[1], sys.argv[2], sys.argv[3]
+with open(src) as f:
+    data = json.load(f)
+data["version"] = version
+with open(dst, "w") as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+    f.write("\n")
+PYEOF
+
+LOCALES="$(python3 -c "import json,sys; data=json.load(open(sys.argv[1])); print('\n'.join(l['locale'] for l in data['locales']))" "$LOCALES_FILE")"
+
+while IFS= read -r locale; do
   if [ -z "$locale" ]; then
     continue
   fi
@@ -70,4 +84,4 @@ while IFS= read -r locale || [ -n "$locale" ]; do
   ]
 }
 EOF
-done < "$LOCALE_LIST_FILE"
+done <<< "$LOCALES"

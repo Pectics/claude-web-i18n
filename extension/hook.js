@@ -1,6 +1,7 @@
 (function () {
   const OVERRIDE_STORAGE_KEY = "claude-i18n:locale";
-  const EXTENSION_LOCALES = new Set(["zh-CN"]);
+  const EXTENSION_LOCALES_STORAGE_KEY = "claude-i18n:extension-locales";
+  const EXTENSION_LOCALES = readExtensionLocales();
   const ORIGINAL_ORIGIN = "https://claude.ai";
   const STORE_FLAG = "__CLAUDE_I18N_STORE__";
   const STATUS_FLAG = "__CLAUDE_I18N_RUNTIME_STATUS__";
@@ -252,6 +253,16 @@
 
   function isExtensionLocale(locale) {
     return typeof locale === "string" && EXTENSION_LOCALES.has(locale);
+  }
+
+  function readExtensionLocales() {
+    try {
+      const raw = window.localStorage.getItem(EXTENSION_LOCALES_STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? new Set(parsed) : new Set();
+    } catch {
+      return new Set();
+    }
   }
 
   function toUrl(input) {

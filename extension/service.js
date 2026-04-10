@@ -2,30 +2,90 @@ const CACHE_NAME = "claude-i18n-cache-v1";
 const REMOTE_BASE_URL = "https://claude-web-i18n.vercel.app";
 const VERSION_STORAGE_KEY = "claude-i18n:versions";
 const BODY_STORAGE_KEY = "claude-i18n:bodies";
+const LOCALE_MANIFEST_KEY = "claude-i18n:locale-manifest";
+
+chrome.runtime.onInstalled.addListener(() => {
+  fetchAndCacheLocaleManifest().catch((error) => {
+    console.warn("[claude-i18n] failed to prefetch locale manifest on install", error);
+  });
+});
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (!message || message.type !== "i18n-fetch") {
+  if (!message) {
     return false;
   }
 
-  handleI18nFetch(message)
-    .then((payload) => sendResponse(payload))
-    .catch((error) => {
-      console.error("[claude-i18n] i18n-fetch failed", error);
-      sendResponse({
-        status: 500,
-        body: JSON.stringify({
-          error: error instanceof Error ? error.message : String(error),
-        }),
-        headers: {
-          "content-type": "application/json; charset=utf-8",
-        },
-        cacheStatus: "error",
+  if (message.type === "get-locale-manifest") {
+    handleGetLocaleManifest()
+      .then((manifest) => sendResponse(manifest))
+      .catch((error) => {
+        console.error("[claude-i18n] get-locale-manifest failed", error);
+        sendResponse(null);
       });
-    });
+    return true;
+  }
 
-  return true;
+  if (message.type === "i18n-fetch") {
+    handleI18nFetch(message)
+      .then((payload) => sendResponse(payload))
+      .catch((error) => {
+        console.error("[claude-i18n] i18n-fetch failed", error);
+        sendResponse({
+          status: 500,
+          body: JSON.stringify({
+            error: error instanceof Error ? error.message : String(error),
+          }),
+          headers: {
+            "content-type": "application/json; charset=utf-8",
+          },
+          cacheStatus: "error",
+        });
+      });
+    return true;
+  }
+
+  return false;
 });
+
+async function handleGetLocaleManifest() {
+  const cached = await getStoredLocaleManifest();
+
+  // Background revalidation (stale-while-revalidate)
+  fetchAndCacheLocaleManifest().catch((error) => {
+    console.warn("[claude-i18n] background locale manifest revalidation failed", error);
+  });
+
+  return cached;
+}
+
+async function fetchAndCacheLocaleManifest() {
+  const response = await fetch(`${REMOTE_BASE_URL}/locales.json`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Locale manifest fetch failed: ${response.status}`);
+  }
+
+  const manifest = await response.json();
+  const current = await getStoredLocaleManifest();
+
+  if (current?.version === manifest.version) {
+    return manifest;
+  }
+
+  await chrome.storage.local.set({
+    [LOCALE_MANIFEST_KEY]: { ...manifest, fetchedAt: new Date().toISOString() },
+  });
+
+  console.log("[claude-i18n] locale manifest updated", { version: manifest.version });
+  return manifest;
+}
+
+async function getStoredLocaleManifest() {
+  const data = await chrome.storage.local.get(LOCALE_MANIFEST_KEY);
+  return data[LOCALE_MANIFEST_KEY] ?? null;
+}
 
 async function handleI18nFetch(message) {
   const requestUrl = new URL(message.url);
