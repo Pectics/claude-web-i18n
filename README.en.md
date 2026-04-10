@@ -25,11 +25,9 @@ After installation, a **简体中文** option appears in Claude Web's language m
 
 <div align="center">
 
-| Before | After |
-|:---:|:---:|
-| All-English UI, hunting for settings | Chinese interface, everything where you'd expect |
-| Hesitant to click anything | Feels like a native app |
-| Re-orienting yourself every session | Your choice is remembered, permanently |
+<img src="showcase-1.png" width="720" alt="Before and after comparison" />
+
+<img src="showcase-2.png" width="720" alt="Fully translated Chinese interface" />
 
 </div>
 
