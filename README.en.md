@@ -35,9 +35,16 @@ After installation, a **简体中文** option appears in Claude Web's language m
 
 ## Installation
 
-### Option 1: Download from Releases (recommended)
+### Option 1: Install from store (recommended)
 
 > ⚡ Done in 30 seconds, no technical knowledge required
+
+- Chrome Web Store:
+  [Claude i18n](https://chromewebstore.google.com/detail/claude-i18n/fkfmbjccelbeolkoekeaegajhhdndajj)
+- Microsoft Edge Add-ons:
+  [Claude i18n](https://microsoftedge.microsoft.com/addons/detail/claude-i18n/meogggfdmdeigjpkcpkdhngaegpncgjc)
+
+### Option 2: Download from Releases
 
 1. Go to the [Releases page](https://github.com/pectics/claude-web-i18n/releases) and download the latest `.crx` file
 2. Open Chrome / Edge and navigate to `chrome://extensions/`
@@ -46,7 +53,7 @@ After installation, a **简体中文** option appears in Claude Web's language m
 5. Click "Add extension" to confirm
 6. Open [claude.ai](https://claude.ai), click your username in the bottom-left → Language → **简体中文** ✓
 
-### Option 2: Build from source
+### Option 3: Build from source
 
 ```bash
 git clone https://github.com/pectics/claude-web-i18n.git
@@ -54,13 +61,6 @@ cd claude-web-i18n
 ```
 
 Then in `chrome://extensions/`, enable **Developer mode**, click "Load unpacked", and select the project's `extension/` directory.
-
-### Option 3: Install from store
-
-- Chrome Web Store:
-  [Claude i18n](https://chromewebstore.google.com/detail/claude-i18n/fkfmbjccelbeolkoekeaegajhhdndajj)
-- Microsoft Edge Add-ons:
-  [Claude i18n](https://microsoftedge.microsoft.com/addons/detail/claude-i18n/meogggfdmdeigjpkcpkdhngaegpncgjc)
 
 ---
 
