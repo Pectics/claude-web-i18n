@@ -1,7 +1,7 @@
-const CACHE_NAME = "claude-i18n-cache-v1";
+const CACHE_NAME = "claude-i18n-cache-v2";
 const REMOTE_BASE_URL = "https://claude-web-i18n.vercel.app";
 const VERSION_STORAGE_KEY = "claude-i18n:versions";
-const BODY_STORAGE_KEY = "claude-i18n:bodies";
+const BODY_STORAGE_KEY = "claude-i18n:bodies-v2";
 const LOCALE_MANIFEST_KEY = "claude-i18n:locale-manifest";
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -67,7 +67,9 @@ async function fetchAndCacheLocaleManifest() {
     throw new Error(`Locale manifest fetch failed: ${response.status}`);
   }
 
-  const manifest = await response.json();
+  const manifestText = await response.text();
+  assertJsonText(manifestText, "locales.json");
+  const manifest = JSON.parse(manifestText);
   const current = await getStoredLocaleManifest();
 
   if (current?.version === manifest.version) {
@@ -182,7 +184,9 @@ async function fetchVersionManifest(locale) {
     throw new Error(`Version manifest fetch failed: ${response.status}`);
   }
 
-  return response.json();
+  const body = await response.text();
+  assertJsonText(body, `version manifest for ${locale}`);
+  return JSON.parse(body);
 }
 
 function getResourceHash(versionManifest, resourceKind) {
@@ -210,24 +214,42 @@ async function fetchRemotePayload(remoteUrl) {
     throw new Error(`Remote language pack fetch failed: ${response.status}`);
   }
 
-  return responseToPayload(response);
+  const payload = await responseToPayload(response);
+  assertPayloadLooksLikeJson(payload, remoteUrl);
+  return payload;
 }
 
 async function readCachedPayload(resource) {
   const cachePayload = await readCacheStoragePayload(resource);
   if (cachePayload) {
-    return {
-      ...cachePayload,
-      cacheStatus: "hit-cache-storage",
-    };
+    if (!isPayloadValidJson(cachePayload)) {
+      console.warn("[claude-i18n] invalid cache storage payload, purging", {
+        cacheKey: resource.cacheKey,
+        preview: previewPayload(cachePayload),
+      });
+      await deleteCacheStoragePayload(resource);
+    } else {
+      return {
+        ...cachePayload,
+        cacheStatus: "hit-cache-storage",
+      };
+    }
   }
 
   const storagePayload = await readStoragePayload(resource.cacheKey);
   if (storagePayload) {
-    return {
-      ...storagePayload,
-      cacheStatus: "hit-storage-local",
-    };
+    if (!isPayloadValidJson(storagePayload)) {
+      console.warn("[claude-i18n] invalid storage.local payload, purging", {
+        cacheKey: resource.cacheKey,
+        preview: previewPayload(storagePayload),
+      });
+      await deleteStoragePayload(resource.cacheKey);
+    } else {
+      return {
+        ...storagePayload,
+        cacheStatus: "hit-storage-local",
+      };
+    }
   }
 
   return null;
@@ -261,6 +283,7 @@ async function persistPayload(resource, payload, versionValue) {
 
 async function writeCacheStoragePayload(resource, payload) {
   try {
+    assertPayloadLooksLikeJson(payload, resource.remoteUrl);
     const cache = await caches.open(CACHE_NAME);
     const response = new Response(payload.body, {
       status: payload.status,
@@ -304,6 +327,7 @@ async function readStoragePayload(cacheKey) {
 
 async function writeStoragePayload(cacheKey, payload) {
   try {
+    assertPayloadLooksLikeJson(payload, cacheKey);
     const data = await chrome.storage.local.get(BODY_STORAGE_KEY);
     const bodies = data[BODY_STORAGE_KEY] ?? {};
     bodies[cacheKey] = payload;
@@ -329,4 +353,76 @@ async function responseToPayload(response) {
     headers,
     body: await response.text(),
   };
+}
+
+async function deleteCacheStoragePayload(resource) {
+  try {
+    const cache = await caches.open(CACHE_NAME);
+    await cache.delete(resource.cacheRequest);
+  } catch (error) {
+    console.warn("[claude-i18n] cache storage delete failed", {
+      cacheKey: resource.cacheKey,
+      error,
+    });
+  }
+}
+
+async function deleteStoragePayload(cacheKey) {
+  try {
+    const data = await chrome.storage.local.get(BODY_STORAGE_KEY);
+    const bodies = data[BODY_STORAGE_KEY] ?? {};
+    if (!(cacheKey in bodies)) {
+      return;
+    }
+    delete bodies[cacheKey];
+    await chrome.storage.local.set({
+      [BODY_STORAGE_KEY]: bodies,
+    });
+  } catch (error) {
+    console.warn("[claude-i18n] storage.local body delete failed", {
+      cacheKey,
+      error,
+    });
+  }
+}
+
+function isPayloadValidJson(payload) {
+  if (!payload || typeof payload.body !== "string") {
+    return false;
+  }
+
+  try {
+    JSON.parse(payload.body);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function assertPayloadLooksLikeJson(payload, label) {
+  assertJsonText(payload?.body, label);
+}
+
+function assertJsonText(body, label) {
+  if (typeof body !== "string") {
+    throw new Error(`Expected JSON string for ${label}`);
+  }
+
+  try {
+    JSON.parse(body);
+  } catch (error) {
+    throw new Error(
+      `Invalid JSON for ${label}: ${error instanceof Error ? error.message : String(error)}; preview=${JSON.stringify(
+        previewText(body),
+      )}`,
+    );
+  }
+}
+
+function previewPayload(payload) {
+  return previewText(payload?.body ?? "");
+}
+
+function previewText(text) {
+  return String(text).slice(0, 120);
 }
