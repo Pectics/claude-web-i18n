@@ -69,6 +69,20 @@
     const url = toUrl(input);
     const overrideLocale = readOverrideLocale();
 
+    if (isExtensionLocale(overrideLocale) && isTargetGatedMessagesRequest(url)) {
+      console.log("[claude-i18n] served gated messages stub", {
+        locale: overrideLocale,
+        url: url.toString(),
+      });
+
+      return new Response('{"messages":{},"gates":[]}', {
+        status: 200,
+        headers: {
+          "content-type": "application/json; charset=utf-8",
+        },
+      });
+    }
+
     if (isExtensionLocale(overrideLocale) && isTargetI18nRequest(url)) {
       const payload = await requestExtensionPayload(overrideLocale, url.toString());
       console.log("[claude-i18n] served i18n request via extension cache", {
@@ -292,6 +306,14 @@
       /^\/i18n\/statsig\/[^/]+\.json$/.test(url.pathname) ||
       /^\/i18n\/[^/]+\.overrides\.json$/.test(url.pathname)
     );
+  }
+
+  function isTargetGatedMessagesRequest(url) {
+    if (!url || url.origin !== ORIGINAL_ORIGIN) {
+      return false;
+    }
+
+    return url.pathname === "/web-api/gated-messages";
   }
 
   function requestExtensionPayload(locale, url) {
