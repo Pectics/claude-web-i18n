@@ -55,9 +55,12 @@ cd claude-web-i18n
 
 然後在 `chrome://extensions/` 中開啟**開發人員模式**，選擇「載入未封裝項目」，選取專案的 `extension/` 目錄。
 
-### 方式三：應用程式商店安裝（審核中）
+### 方式三：應用程式商店安裝
 
-Chrome Web Store 和 Edge 附加元件商店的版本正在審核，上架後會在此更新連結，敬請期待。
+- Chrome Web Store：
+  [Claude i18n](https://chromewebstore.google.com/detail/claude-i18n/fkfmbjccelbeolkoekeaegajhhdndajj)
+- Microsoft Edge Add-ons：
+  [Claude i18n](https://microsoftedge.microsoft.com/addons/detail/claude-i18n/meogggfdmdeigjpkcpkdhngaegpncgjc)
 
 ---
 

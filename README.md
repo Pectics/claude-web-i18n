@@ -55,9 +55,12 @@ cd claude-web-i18n
 
 然后在 `chrome://extensions/` 中打开**开发者模式**，选择「加载已解压的扩展程序」，选择项目的 `extension/` 目录。
 
-### 方式三：应用商店安装（审核中）
+### 方式三：应用商店安装
 
-Chrome Web Store 和 Edge 外接程序商店的版本正在审核，上架后会在此更新链接，敬请期待。
+- Chrome Web Store：
+  [Claude i18n](https://chromewebstore.google.com/detail/claude-i18n/fkfmbjccelbeolkoekeaegajhhdndajj)
+- Microsoft Edge Add-ons：
+  [Claude i18n](https://microsoftedge.microsoft.com/addons/detail/claude-i18n/meogggfdmdeigjpkcpkdhngaegpncgjc)
 
 ---
 

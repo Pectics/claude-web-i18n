@@ -55,9 +55,12 @@ cd claude-web-i18n
 
 Then in `chrome://extensions/`, enable **Developer mode**, click "Load unpacked", and select the project's `extension/` directory.
 
-### Option 3: Install from store (pending review)
+### Option 3: Install from store
 
-Submissions to the Chrome Web Store and Edge Add-ons store are currently under review. Links will be added here once approved.
+- Chrome Web Store:
+  [Claude i18n](https://chromewebstore.google.com/detail/claude-i18n/fkfmbjccelbeolkoekeaegajhhdndajj)
+- Microsoft Edge Add-ons:
+  [Claude i18n](https://microsoftedge.microsoft.com/addons/detail/claude-i18n/meogggfdmdeigjpkcpkdhngaegpncgjc)
 
 ---
 
