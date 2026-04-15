@@ -29,7 +29,7 @@ print(manifest["version"])
 PY
 )"
 
-OUTPUT_ZIP="$DIST_DIR/claude-i18n-edge-$VERSION.zip"
+OUTPUT_ZIP="$DIST_DIR/claude-i18n-extension-$VERSION.zip"
 
 rm -rf "$STAGING_DIR"
 mkdir -p "$STAGING_DIR" "$DIST_DIR"
@@ -52,4 +52,4 @@ PY
 
 rm -rf "$STAGING_DIR"
 
-echo "Created Edge package: $OUTPUT_ZIP"
+echo "Created extension package: $OUTPUT_ZIP"

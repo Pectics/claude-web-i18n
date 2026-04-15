@@ -115,11 +115,11 @@ UI 全面切换为中文，无需刷新
 ### 本地构建
 
 ```bash
-# 构建语言包分发文件
+# 构建 Vercel 部署用的语言包分发文件
 ./build.sh
 
-# 打包 Edge 版本 zip
-./build-edge-zip.sh
+# 打包浏览器扩展 zip
+./package-extension-zip.sh
 ```
 
 ---

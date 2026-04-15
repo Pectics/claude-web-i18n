@@ -115,11 +115,11 @@ Edit the JSON file and open a PR. The structure is straightforward:
 ### Local build
 
 ```bash
-# Build language pack distribution files
+# Build language pack distribution files for Vercel
 ./build.sh
 
-# Package Edge add-on zip
-./build-edge-zip.sh
+# Package the browser extension zip
+./package-extension-zip.sh
 ```
 
 ---
