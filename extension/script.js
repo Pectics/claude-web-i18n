@@ -1,6 +1,5 @@
 const EXTENSION_LOCALES_STORAGE_KEY = "claude-i18n:extension-locales";
 const OVERRIDE_STORAGE_KEY = "claude-i18n:locale";
-const PAGE_HOOK_SCRIPT_ID = "claude-i18n-page-hook";
 const MENU_STYLE_ID = "claude-i18n-menu-style";
 const PAGE_REQUEST_SOURCE = "claude-i18n-page";
 const PAGE_RESPONSE_SOURCE = "claude-i18n-extension";
@@ -11,23 +10,10 @@ let pageRequestCounter = 0;
 // Locale manifest loaded from service worker; fallback to empty until fetched.
 let extensionLocaleMap = new Map(); // locale -> { locale, name }
 
-injectPageHook();
 injectMenuStyle();
 registerPageHookBridge();
 startMenuObserver();
 loadLocaleManifest();
-
-function injectPageHook() {
-  if (document.getElementById(PAGE_HOOK_SCRIPT_ID)) {
-    return;
-  }
-
-  const script = document.createElement("script");
-  script.id = PAGE_HOOK_SCRIPT_ID;
-  script.src = chrome.runtime.getURL("hook.js");
-  script.async = false;
-  (document.head ?? document.documentElement).append(script);
-}
 
 function injectMenuStyle() {
   if (document.getElementById(MENU_STYLE_ID)) {

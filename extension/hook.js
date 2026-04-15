@@ -1,4 +1,9 @@
 (function () {
+  if (window.__CLAUDE_I18N_PAGE_HOOK_INSTALLED__) {
+    return;
+  }
+  window.__CLAUDE_I18N_PAGE_HOOK_INSTALLED__ = true;
+
   const OVERRIDE_STORAGE_KEY = "claude-i18n:locale";
   const EXTENSION_LOCALES_STORAGE_KEY = "claude-i18n:extension-locales";
   const EXTENSION_LOCALES = readExtensionLocales();

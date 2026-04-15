@@ -17,19 +17,19 @@
   "content_scripts": [
     {
       "js": [
-        "script.js"
+        "hook.js"
       ],
+      "world": "MAIN",
       "run_at": "document_start",
       "matches": [
         "https://claude.ai/*"
       ]
-    }
-  ],
-  "web_accessible_resources": [
+    },
     {
-      "resources": [
-        "hook.js"
+      "js": [
+        "script.js"
       ],
+      "run_at": "document_start",
       "matches": [
         "https://claude.ai/*"
       ]
