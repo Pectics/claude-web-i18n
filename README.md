@@ -8,7 +8,7 @@
 
 简体中文 | [繁體中文](README.tw.md) | [English](README.en.md)
 
-[![Version](https://img.shields.io/badge/版本-v1.0.0-orange?style=flat-square)](https://github.com/pectics/claude-web-i18n/releases)
+[![Version](https://img.shields.io/badge/版本-v1.0.2-orange?style=flat-square)](https://github.com/pectics/claude-web-i18n/releases)
 [![License](https://img.shields.io/badge/许可证-MIT-blue?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/平台-Chrome%20%7C%20Edge-brightgreen?style=flat-square)](#安装)
 [![Locale](https://img.shields.io/badge/已支持-简体中文-red?style=flat-square)](#支持的语言)
@@ -121,6 +121,29 @@ UI 全面切换为中文，无需刷新
 # 打包浏览器扩展 zip
 ./package-extension-zip.sh
 ```
+
+---
+
+## 更新日志
+
+### 1.0.2
+
+- 跟进 Claude Web 最近的前端逻辑更新，恢复自定义语言切换能力
+- 调整 page hook 注入方式，避免 runtime i18n store 因时序问题捕获失败
+- 兼容新版 `gated-messages` 请求链路，防止切换到扩展语言时被 404 HTML 响应中断
+- 增加坏缓存自清理逻辑，旧的无效 HTML 响应不会再长期污染语言包缓存
+
+### 1.0.1
+
+- 前端逆向成功，打通 Claude Web 运行时语言覆盖入口
+- 语言切换变为无刷新即时生效，整体体验明显更顺滑
+- 菜单注入、运行时切换、语言包拦截与本地缓存链路正式闭环
+
+### 1.0.0
+
+- 初始 MVP 版本发布
+- 在 Claude Web 语言菜单中注入简体中文入口
+- 提供基础中文语言包分发、请求拦截与浏览器端加载能力
 
 ---
 

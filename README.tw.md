@@ -8,7 +8,7 @@
 
 [简体中文](README.md) | 繁體中文 | [English](README.en.md)
 
-[![Version](https://img.shields.io/badge/版本-v1.0.0-orange?style=flat-square)](https://github.com/pectics/claude-web-i18n/releases)
+[![Version](https://img.shields.io/badge/版本-v1.0.2-orange?style=flat-square)](https://github.com/pectics/claude-web-i18n/releases)
 [![License](https://img.shields.io/badge/授權-MIT-blue?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/平台-Chrome%20%7C%20Edge-brightgreen?style=flat-square)](#安裝)
 [![Locale](https://img.shields.io/badge/已支援-簡體中文-red?style=flat-square)](#支援的語言)
@@ -121,6 +121,29 @@ UI 全面切換為中文，無需重整
 # 打包瀏覽器擴充功能 zip
 ./package-extension-zip.sh
 ```
+
+---
+
+## 更新日誌
+
+### 1.0.2
+
+- 跟進 Claude Web 最近的前端邏輯更新，恢復自訂語言切換能力
+- 調整 page hook 注入方式，避免 runtime i18n store 因時序問題捕獲失敗
+- 相容新版 `gated-messages` 請求鏈路，防止切換到擴充語言時被 404 HTML 回應中斷
+- 增加壞快取自清理邏輯，舊的無效 HTML 回應不會再長期污染語言包快取
+
+### 1.0.1
+
+- 前端逆向成功，打通 Claude Web 執行時語言覆寫入口
+- 語言切換改為無需重新整理即可即時生效，整體體驗更順暢
+- 選單注入、執行時切換、語言包攔截與本機快取鏈路正式閉環
+
+### 1.0.0
+
+- 初始 MVP 版本發佈
+- 在 Claude Web 語言選單中注入簡體中文入口
+- 提供基礎中文語言包發佈、請求攔截與瀏覽器端載入能力
 
 ---
 

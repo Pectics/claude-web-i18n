@@ -8,7 +8,7 @@
 
 [简体中文](README.md) | [繁體中文](README.tw.md) | English
 
-[![Version](https://img.shields.io/badge/version-v1.0.0-orange?style=flat-square)](https://github.com/pectics/claude-web-i18n/releases)
+[![Version](https://img.shields.io/badge/version-v1.0.2-orange?style=flat-square)](https://github.com/pectics/claude-web-i18n/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Chrome%20%7C%20Edge-brightgreen?style=flat-square)](#installation)
 [![Locale](https://img.shields.io/badge/supported-Simplified%20Chinese-red?style=flat-square)](#supported-languages)
@@ -121,6 +121,29 @@ Edit the JSON file and open a PR. The structure is straightforward:
 # Package the browser extension zip
 ./package-extension-zip.sh
 ```
+
+---
+
+## Changelog
+
+### 1.0.2
+
+- Updated the extension to track Claude Web's latest frontend changes
+- Moved the page hook to a more reliable runtime injection path so the i18n store can be captured again
+- Stubbed the new `gated-messages` request path for extension locales to avoid 404 HTML responses breaking switches
+- Added self-healing cache validation so stale invalid HTML payloads no longer poison the local language-pack cache
+
+### 1.0.1
+
+- Completed the frontend reverse engineering needed to reach Claude Web's runtime locale override entry
+- Language switching became instant and reload-free
+- Menu injection, runtime switching, request interception, and local caching all worked together as a polished flow
+
+### 1.0.0
+
+- Initial MVP release
+- Added a Simplified Chinese entry to Claude Web's language menu
+- Shipped the first working version of the hosted language packs, request interception, and browser-side loading flow
 
 ---
 
